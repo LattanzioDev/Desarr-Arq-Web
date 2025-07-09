@@ -1,0 +1,119 @@
+/* Fondo estilo espacio */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at center, #0b0c10, #1f2833);
+  color: #f5f5f5;
+  margin: 0;
+  padding: 0;
+}
+
+/* Contenedor principal */
+.container {
+  max-width: 1200px;
+  margin: 30px auto;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+}
+
+/* Títulos */
+h1, h2 {
+  text-align: center;
+  color: #00ff90;
+  text-shadow: 0 0 10px #00ff90;
+  margin-bottom: 20px;
+}
+
+/* Botones */
+button {
+  padding: 10px 20px;
+  background-color: #00ff90;
+  border: none;
+  color: #000;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  box-shadow: 0 0 10px #00ff90;
+}
+
+button:hover {
+  background-color: #00cc74;
+}
+
+/* Inputs de filtro */
+form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+form input {
+  padding: 10px;
+  border: 2px solid #00ff90;
+  border-radius: 8px;
+  width: 180px;
+  background: #111;
+  color: #00ff90;
+  font-weight: bold;
+}
+
+form input::placeholder {
+  color: #00ff9070;
+}
+
+/* Resultados centrados */
+.results {
+  display: grid;
+  justify-content: center;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+  padding: 20px;
+}
+
+/* Estilo de tarjeta */
+.card {
+  background: #141f1f;
+  border: 2px solid #00ff90;
+  border-radius: 12px;
+  text-align: center;
+  padding: 15px;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.card h3 {
+  color: #00ff90;
+  margin-bottom: 5px;
+}
+
+.card p {
+  font-size: 0.9rem;
+  margin: 4px 0;
+}
+
+/* Errores */
+.error {
+  color: #ff4d4d;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.oculto {
+  display: none;
+}
