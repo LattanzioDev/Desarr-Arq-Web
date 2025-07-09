@@ -31,15 +31,31 @@ function limpiarError() {
   errorDiv.classList.add('oculto');
 }
 
-async function fetchCharacters(url) {
+async function fetchAllCharacters() {
   try {
     limpiarError();
-    resultsDiv.innerHTML = 'Cargando...';
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('No se encontraron personajes.');
-    const data = await response.json();
-    if (!data.results || data.results.length === 0) throw new Error('No hay personajes para mostrar.');
-    renderCharacters(data.results);
+    resultsDiv.innerHTML = 'Cargando personajes...';
+
+    const firstPage = await fetch(API_URL);
+    if (!firstPage.ok) throw new Error('No se pudo obtener la información');
+    const data = await firstPage.json();
+
+    const totalPages = data.info.pages;
+    let allCharacters = [...data.results];
+
+    // Crear array de promesas para páginas 2 a N
+    const fetchPromises = [];
+    for (let i = 2; i <= totalPages; i++) {
+      fetchPromises.push(fetch(`${API_URL}?page=${i}`).then(res => res.json()));
+    }
+
+    // Esperar a todas las respuestas
+    const allResults = await Promise.all(fetchPromises);
+    allResults.forEach(page => {
+      allCharacters.push(...page.results);
+    });
+
+    renderCharacters(allCharacters);
   } catch (error) {
     resultsDiv.innerHTML = '';
     mostrarError(error.message);
@@ -47,9 +63,10 @@ async function fetchCharacters(url) {
 }
 
 allButton.addEventListener('click', () => {
-  fetchCharacters(API_URL);
+  fetchAllCharacters();
 });
 
+//Búsqueda con filtros
 filterForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const name = document.getElementById('name').value;
@@ -66,5 +83,36 @@ filterForm.addEventListener('submit', (e) => {
   if (gender) queryParams.append('gender', gender);
 
   const url = `${API_URL}/?${queryParams.toString()}`;
-  fetchCharacters(url);
+  fetchCharactersWithFilters(url);
 });
+
+async function fetchCharactersWithFilters(url) {
+  try {
+    limpiarError();
+    resultsDiv.innerHTML = 'Buscando...';
+    
+    const firstPage = await fetch(url);
+    if (!firstPage.ok) throw new Error('No se encontraron personajes.');
+    const data = await firstPage.json();
+
+    const totalPages = data.info.pages;
+    let filteredCharacters = [...data.results];
+
+    const fetchPromises = [];
+    for (let i = 2; i <= totalPages; i++) {
+      const pagedUrl = `${url}&page=${i}`;
+      fetchPromises.push(fetch(pagedUrl).then(res => res.json()));
+    }
+
+    const allResults = await Promise.all(fetchPromises);
+    allResults.forEach(page => {
+      filteredCharacters.push(...page.results);
+    });
+
+    renderCharacters(filteredCharacters);
+  } catch (error) {
+    resultsDiv.innerHTML = '';
+    mostrarError(error.message);
+  }
+}
+
