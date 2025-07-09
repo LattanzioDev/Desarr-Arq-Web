@@ -84,42 +84,48 @@ window.addEventListener('DOMContentLoaded', () => {
 
    
     form.addEventListener('submit', async e => {
-        e.preventDefault();
-        let isValid = true;
-        const params = new URLSearchParams();
+    e.preventDefault();
+    let isValid = true;
+    const datosForm = {};
 
-        Object.entries(fields).forEach(([key, { element, validate, message }]) => {
-            const value = element.value.trim();
-            if (!validate(value)) {
-                showError(element, message);
-                isValid = false;
-            } else {
-                params.append(key, value);
-            }
+    Object.entries(fields).forEach(([key, { element, validate, message }]) => {
+        const value = element.value.trim();
+        if (!validate(value)) {
+            showError(element, message);
+            isValid = false;
+        } else {
+            datosForm[key] = value;
+        }
+    });
+
+    if (!isValid) {
+        mostrarModal('Formulario inválido. Verificá los campos marcados.');
+        return;
+    }
+
+    try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datosForm)
         });
 
-        if (!isValid) {
-            mostrarModal('Formulario inválido. Verificá los campos marcados.');
-            return;
+        const data = await response.json();
+
+        if (response.ok) {
+            const lista = Object.entries(data)
+                .map(([key, val]) => `<li><strong>${key}</strong>: ${val}</li>`)
+                .join('');
+            mostrarModal(`✅ Suscripción exitosa.<br><br><ul>${lista}</ul>`);
+            localStorage.setItem('datosNewsletter', JSON.stringify(data));
+        } else {
+            mostrarModal(`❌ Error en la suscripción.<br><br><strong>Detalles:</strong><br>${data?.error || 'Error desconocido.'}`);
         }
+    } catch (err) {
+        mostrarModal('⚠️ Error de conexión con el servidor.');
+    }
+});
 
-        try {
-            const url = `http://curso-dev-2021.herokuapp.com/newsletter?${params.toString()}`;
-            const response = await fetch(url);
-
-            const data = await response.json();
-
-            if (response.ok) {
-                mostrarModal(`✅ Suscripción exitosa.<br><br><strong>Respuesta:</strong><br>${JSON.stringify(data)}`);
-                localStorage.setItem('datosNewsletter', JSON.stringify(Object.fromEntries(params)));
-            } else {
-                mostrarModal(`❌ Error en la suscripción.<br><br><strong>Detalles:</strong><br>${data?.error || 'Error desconocido.'}`);
-            }
-        } catch (err) {
-            mostrarModal('⚠️ Error de conexión con el servidor.');
-        }
-    
-    });
 
     function mostrarModal(mensaje) {
         const modal = document.getElementById('modal');
